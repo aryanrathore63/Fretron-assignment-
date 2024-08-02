@@ -1,0 +1,219 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Board {
+public:
+    int size;
+    vector<vector<char>> board;
+    pair<int, int> castle_position;
+
+    Board(int n) : size(n), board(n, vector<char>(n, '.')), castle_position({-1, -1}) {}
+
+    void place_soldiers(const vector<pair<int, int>>& positions) {
+        for (const auto& pos : positions) {
+            board[pos.first][pos.second] = 'S';
+        }
+    }
+
+    void set_castle_position(pair<int, int> position) {
+        castle_position = position;
+        board[position.first][position.second] = 'C';
+    }
+
+    void display() {
+        for (const auto& row : board) {
+            for (const auto& cell : row) {
+                cout << cell << ' ';
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
+
+    void move_castle(const vector<char>& path) {
+        int x = castle_position.first;
+        int y = castle_position.second;
+        board[x][y] = '.'; // Remove the castle from the initial position
+        for (const auto& step : path) {
+            if (step == 'F') {
+                x += 1;
+            } else if (step == 'L') {
+                y -= 1;
+            } else if (step == 'R') {
+                y += 1;
+            } else if (step == 'B') {
+                x -= 1;
+            }
+
+            if (board[x][y] == 'S') {
+                board[x][y] = '.';
+                cout << "Castle killed soldier at (" << x + 1 << "," << y + 1 << ")" << endl; // Convert to 1-indexed for display
+            }
+        }
+        castle_position = {x, y};
+        board[x][y] = 'C';
+        display();
+    }
+};
+
+int main() {
+    int size = 10;
+    Board board(size);
+
+    vector<pair<int, int>> soldier_positions;
+    int num_soldiers;
+    cout << "Enter number of soldiers: ";
+    cin >> num_soldiers;
+    
+    for (int i = 0; i < num_soldiers; ++i) {
+        int x, y;
+        cout << "Enter coordinates for soldier " << i + 1 << ": ";
+        cin >> x >> y;
+        soldier_positions.emplace_back(x - 1, y - 1); 
+    }
+
+    board.place_soldiers(soldier_positions);
+    board.display();
+
+    int cx, cy;
+    cout << "Enter the coordinates for your 'special' castle: ";
+    cin >> cx >> cy;
+    board.set_castle_position({cx - 1, cy - 1}); 
+    board.display();
+
+   
+    vector<char> red_path = {'R', 'R', 'R', 'R', 'R', 'R', 'R', 'L', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'L', 'F', 'L'};
+    cout << "Red Path:" << endl;
+    board.move_castle(red_path);
+
+    
+    board = Board(size);
+    board.place_soldiers(soldier_positions);
+    board.set_castle_position({cx - 1, cy - 1});
+    board.display();
+
+    
+    vector<char> green_path = {'R', 'R', 'R', 'R', 'R', 'R', 'R', 'L', 'F', 'L', 'F', 'L', 'F', 'F', 'L', 'F', 'L'};
+    cout << "Green Path:" << endl;
+    board.move_castle(green_path);
+
+    board = Board(size);
+    board.place_soldiers(soldier_positions);
+    board.set_castle_position({cx - 1, cy - 1});
+    board.display();
+
+    vector<char> path_3 = {'R', 'R', 'R', 'R', 'R', 'R', 'R', 'L', 'F', 'F', 'F', 'L', 'F', 'L', 'F', 'L', 'F', 'L', 'F', 'L'};
+    cout << "Path 3:" << endl;
+    board.move_castle(path_3);
+
+    return 0;
+}
+
+/*Sample Output :
+[?2004l
+Enter number of soldiers: 11
+Enter coordinates for soldier 1: 1 1
+Enter coordinates for soldier 2: 8 9
+Enter coordinates for soldier 3: 1 9
+Enter coordinates for soldier 4: 4 1 
+Enter coordinates for soldier 5: 4 2
+Enter coordinates for soldier 6: 4 8 
+Enter coordinates for soldier 7: 2 6
+Enter coordinates for soldier 8: 5 6
+Enter coordinates for soldier 9: 8 2
+Enter coordinates for soldier 10: 5 9
+Enter coordinates for soldier 11: 2 8
+S . . . . . . . S . 
+. . . . . S . S . . 
+. . . . . . . . . . 
+S S . . . . . S . . 
+. . . . . S . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. S . . . . . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+
+Enter the coordinates for your 'special' castle: 1 2
+S C . . . . . . S . 
+. . . . . S . S . . 
+. . . . . . . . . . 
+S S . . . . . S . . 
+. . . . . S . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. S . . . . . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+
+Red Path:
+Castle killed soldier at (1,9)
+Castle killed soldier at (2,8)
+Castle killed soldier at (4,8)
+S . . . . . . . . . 
+. . . . . S . . . . 
+. . . . . . . . . . 
+S S . . . . . . . . 
+. . . . . S . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. S . . . . . . S . 
+. . . . . C . . . . 
+. . . . . . . . . . 
+
+S C . . . . . . S . 
+. . . . . S . S . . 
+. . . . . . . . . . 
+S S . . . . . S . . 
+. . . . . S . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. S . . . . . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+
+Green Path:
+Castle killed soldier at (1,9)
+Castle killed soldier at (2,8)
+Castle killed soldier at (5,6)
+S . . . . . . . . . 
+. . . . . S . . . . 
+. . . . . . . . . . 
+S S . . . . . S . . 
+. . . . . . . . S . 
+. . . C . . . . . . 
+. . . . . . . . . . 
+. S . . . . . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+
+S C . . . . . . S . 
+. . . . . S . S . . 
+. . . . . . . . . . 
+S S . . . . . S . . 
+. . . . . S . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. S . . . . . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+
+Path 3:
+Castle killed soldier at (1,9)
+Castle killed soldier at (2,8)
+Castle killed soldier at (4,8)
+Castle killed soldier at (5,6)
+S . . . . . . . . . 
+. . . . . S . . . . 
+. . . . . . . . . . 
+S S . . . . . . . . 
+. . . . . . . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+. S C . . . . . S . 
+. . . . . . . . . . 
+. . . . . . . . . . 
+
+*/
