@@ -1,0 +1,68 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <iomanip>
+using namespace std;
+
+void distribute_apples() {
+    vector<int> apples;
+    int total_weight = 0;
+    
+    while (true) {
+        int weight;
+        cout << "Enter apple weight in gram (-1 to stop): ";
+        cin >> weight;
+        if (weight == -1) break;
+        apples.push_back(weight);
+        total_weight += weight;
+    }
+    // sort the apples
+    sort(apples.begin(), apples.end(), greater<int>());
+    
+    vector<int> ram, sham, rahim;
+    double ram_target = total_weight * 0.5;
+    double sham_target = total_weight * 0.3;
+    double rahim_target = total_weight * 0.2;
+    
+    int ram_weight = 0, sham_weight = 0, rahim_weight = 0;
+    
+    for (int apple : apples) {
+        if (ram_weight < ram_target && 
+            (ram_weight + apple - ram_target <= sham_target - sham_weight && 
+             ram_weight + apple - ram_target <= rahim_target - rahim_weight)) {
+            ram.push_back(apple);
+            ram_weight += apple;
+        } else if (sham_weight < sham_target && 
+                   (sham_weight + apple - sham_target <= ram_target - ram_weight && 
+                    sham_weight + apple - sham_target <= rahim_target - rahim_weight)) {
+            sham.push_back(apple);
+            sham_weight += apple;
+        } else {
+            rahim.push_back(apple);
+            rahim_weight += apple;
+        }
+    }
+    
+    cout << "\nDistribution Result:\n";
+    cout << "Ram: ";
+    for (int  i = 0; i < ram.size(); ++i) {
+        cout << ram[i];
+        if (i < ram.size() - 1) cout << ", ";
+    }
+    cout << "\nSham: ";
+    for (int i = 0; i < sham.size(); ++i) {
+        cout << sham[i];
+        if (i < sham.size() - 1) cout << ", ";
+    }
+    cout << "\nRahim: ";
+    for (int  i = 0; i < rahim.size(); ++i) {
+        cout << rahim[i];
+        if (i < rahim.size() - 1) cout << ", ";
+    }
+    cout << endl;
+}
+
+int main() {
+    distribute_apples();
+    return 0;
+}
